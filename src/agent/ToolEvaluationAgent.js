@@ -53,21 +53,26 @@ For each tool, provide:
 Format your response as a JSON array of objects with fields: name, description, benefit.
 
 Example format:
-[
   {"name": "GitHub Copilot", "description": "AI-powered code completion tool", "benefit": "Speeds up coding by 40%"},
   {"name": "Grammarly", "description": "AI writing assistant", "benefit": "Improves writing quality and catches errors"}
 ]`;
 
     try {
-      // Call Workers AI (assuming env.AI is bound)
-      const response = await this.env.AI.run('@cf/meta/llama-3.1-8b-instruct', {
+      // Call Workers AI with timeout
+      const aiPromise = this.env.AI.run('@cf/meta/llama-3.1-8b-instruct', {
         messages: [
-          { role: 'system', content: 'You are a helpful AI tool recommendation expert. Always respond with valid JSON.' },
+          { role: 'system', content: 'You are an expert at recommending software tools. Always respond with valid JSON array.' },
           { role: 'user', content: prompt }
         ],
         temperature: 0.7,
-        max_tokens: 1500
+        max_tokens: 1000
       });
+      
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('AI generation timeout')), 15000)
+      );
+      
+      const response = await Promise.race([aiPromise, timeoutPromise]);
 
       // Parse the AI response
       let tools = [];
@@ -93,20 +98,112 @@ Example format:
   }
 
   /**
-   * Evaluate impact and effort for each tool
+   * Evaluate impact and effort for each tool (optimized batch approach)
    */
   async evaluateImpactAndEffort(tools, userRequest) {
+    // Try batch evaluation first, fall back to individual if needed
+    try {
+      return await this.batchEvaluateTools(tools, userRequest);
+    } catch (error) {
+      console.error('Batch evaluation failed, falling back to individual:', error);
+      return await this.individualEvaluateTools(tools, userRequest);
+    }
+  }
+
+  /**
+   * Batch evaluate all tools in one AI call (faster)
+   */
+  async batchEvaluateTools(tools, userRequest) {
+    const toolsList = tools.map((tool, index) => 
+      `${index + 1}. ${tool.name}: ${tool.description} - ${tool.benefit}`
+    ).join('\n');
+
+    const prompt = `Evaluate these tools for: "${userRequest}"
+
+Tools to evaluate:
+${toolsList}
+
+Rate each tool (1-10 scale, be realistic and balanced):
+- IMPACT: Business value (most tools should be 4-6, only transformational tools get 8+)
+- EFFORT: Implementation complexity (1=easy, 10=very hard)
+
+Respond with JSON array in this exact format:
+[
+  {"impact": 5, "effort": 3, "reasoning": "brief explanation"},
+  {"impact": 6, "effort": 4, "reasoning": "brief explanation"}
+]`;
+
+    try {
+      const aiPromise = this.env.AI.run('@cf/meta/llama-3.1-8b-instruct', {
+        messages: [
+          { role: 'system', content: 'You are a critical business analyst. Be realistic with scoring. Most tools are moderate impact (4-6). Always respond with valid JSON array.' },
+          { role: 'user', content: prompt }
+        ],
+        temperature: 0.5,
+        max_tokens: 800
+      });
+      
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Batch evaluation timeout')), 20000)
+      );
+      
+      const response = await Promise.race([aiPromise, timeoutPromise]);
+      const content = response.response || response.result?.response || '';
+      const jsonMatch = content.match(/\[[\s\S]*\]/);
+      
+      if (jsonMatch) {
+        const evaluations = JSON.parse(jsonMatch[0]);
+        return tools.map((tool, index) => {
+          const evaluation = evaluations[index] || this.getFallbackEvaluation();
+          return {
+            ...tool,
+            impact: Math.min(10, Math.max(1, evaluation.impact)),
+            effort: Math.min(10, Math.max(1, evaluation.effort)),
+            quadrant: this.determineQuadrant(evaluation.impact, evaluation.effort),
+            reasoning: evaluation.reasoning || 'Batch evaluation'
+          };
+        });
+      }
+      
+      throw new Error('No valid JSON in batch response');
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  /**
+   * Individual tool evaluation (fallback)
+   */
+  async individualEvaluateTools(tools, userRequest) {
     const evaluatedTools = [];
 
-    for (const tool of tools) {
-      const evaluation = await this.evaluateSingleTool(tool, userRequest);
-      evaluatedTools.push({
-        ...tool,
-        impact: evaluation.impact,
-        effort: evaluation.effort,
-        quadrant: this.determineQuadrant(evaluation.impact, evaluation.effort),
-        reasoning: evaluation.reasoning
-      });
+    for (const tool of tools.slice(0, 5)) { // Limit to 5 tools to prevent timeout
+      try {
+        const evaluationPromise = this.evaluateSingleTool(tool, userRequest);
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Individual evaluation timeout')), 8000)
+        );
+        
+        const evaluation = await Promise.race([evaluationPromise, timeoutPromise]);
+        
+        evaluatedTools.push({
+          ...tool,
+          impact: evaluation.impact,
+          effort: evaluation.effort,
+          quadrant: this.determineQuadrant(evaluation.impact, evaluation.effort),
+          reasoning: evaluation.reasoning
+        });
+      } catch (error) {
+        console.error(`Failed to evaluate ${tool.name}:`, error);
+        const fallbackEvaluation = this.getFallbackEvaluation();
+        evaluatedTools.push({
+          ...tool,
+          impact: fallbackEvaluation.impact,
+          effort: fallbackEvaluation.effort,
+          quadrant: this.determineQuadrant(fallbackEvaluation.impact, fallbackEvaluation.effort),
+          reasoning: 'Fallback evaluation due to timeout'
+        });
+      }
     }
 
     return evaluatedTools;
@@ -154,7 +251,7 @@ Respond in JSON format:
 }`;
 
     try {
-      const response = await this.env.AI.run('@cf/meta/llama-3.1-8b-instruct', {
+      const aiPromise = this.env.AI.run('@cf/meta/llama-3.1-8b-instruct', {
         messages: [
           { role: 'system', content: 'You are a critical business analyst evaluating software tools. Be realistic and balanced in your scoring. Most tools should score 4-6 for impact. Only truly transformational tools deserve 8+. Always respond with valid JSON.' },
           { role: 'user', content: prompt }
@@ -162,6 +259,12 @@ Respond in JSON format:
         temperature: 0.5,
         max_tokens: 300
       });
+      
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Single tool evaluation timeout')), 8000)
+      );
+      
+      const response = await Promise.race([aiPromise, timeoutPromise]);
 
       const content = response.response || response.result?.response || '';
       const jsonMatch = content.match(/\{[\s\S]*\}/);
