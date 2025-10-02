@@ -118,14 +118,28 @@ Example format:
       `${index + 1}. ${tool.name}: ${tool.description} - ${tool.benefit}`
     ).join('\n');
 
+    // Dynamic scoring instruction based on number of tools
+    const balancingInstruction = tools.length >= 4 ? 
+      `IMPORTANT: Ensure balanced distribution across quadrants:
+- At least 1 tool with HIGH impact (8+) and LOW effort (1-5) - Quick Wins
+- At least 1 tool with HIGH impact (8+) and HIGH effort (7+) - Major Projects  
+- At least 1 tool with LOW impact (1-5) and LOW effort (1-5) - Fill-ins
+- At least 1 tool with LOW impact (1-5) and HIGH effort (7+) - Time Wasters
+- Remaining tools can be moderate (impact 6-7, effort 4-6)
+
+This ensures all quadrants are represented for better decision-making.` :
+      `Rate realistically - most tools should be moderate impact (4-6).`;
+
     const prompt = `Evaluate these tools for: "${userRequest}"
 
 Tools to evaluate:
 ${toolsList}
 
-Rate each tool (1-10 scale, be realistic and balanced):
-- IMPACT: Business value (most tools should be 4-6, only transformational tools get 8+)
+Rate each tool (1-10 scale):
+- IMPACT: Business value (1=minimal, 10=transformational)
 - EFFORT: Implementation complexity (1=easy, 10=very hard)
+
+${balancingInstruction}
 
 Respond with JSON array in this exact format:
 [
@@ -136,7 +150,7 @@ Respond with JSON array in this exact format:
     try {
       const aiPromise = this.env.AI.run('@cf/meta/llama-3.1-8b-instruct', {
         messages: [
-          { role: 'system', content: 'You are a critical business analyst. Be realistic with scoring. Most tools are moderate impact (4-6). Always respond with valid JSON array.' },
+          { role: 'system', content: 'You are a critical business analyst. When evaluating 4+ tools, ensure balanced distribution across all quadrants for better decision-making. Always respond with valid JSON array.' },
           { role: 'user', content: prompt }
         ],
         temperature: 0.5,
@@ -153,7 +167,7 @@ Respond with JSON array in this exact format:
       
       if (jsonMatch) {
         const evaluations = JSON.parse(jsonMatch[0]);
-        return tools.map((tool, index) => {
+        let evaluatedTools = tools.map((tool, index) => {
           const evaluation = evaluations[index] || this.getFallbackEvaluation();
           return {
             ...tool,
@@ -163,6 +177,13 @@ Respond with JSON array in this exact format:
             reasoning: evaluation.reasoning || 'Batch evaluation'
           };
         });
+
+        // Apply quadrant balancing if we have 4+ tools
+        if (tools.length >= 4) {
+          evaluatedTools = this.ensureQuadrantBalance(evaluatedTools);
+        }
+
+        return evaluatedTools;
       }
       
       throw new Error('No valid JSON in batch response');
@@ -287,6 +308,76 @@ Respond in JSON format:
       effort: Math.floor(Math.random() * 10) + 1, // 1-10
       reasoning: 'Automated evaluation'
     };
+  }
+
+  /**
+   * Ensure balanced distribution across all quadrants
+   */
+  ensureQuadrantBalance(tools) {
+    // Count current quadrant distribution
+    const quadrantCounts = { q1: 0, q2: 0, q3: 0, q4: 0 };
+    tools.forEach(tool => quadrantCounts[tool.quadrant]++);
+
+    // If we already have good distribution, return as-is
+    const hasAllQuadrants = Object.values(quadrantCounts).every(count => count > 0);
+    if (hasAllQuadrants) return tools;
+
+    // Identify missing quadrants
+    const missingQuadrants = Object.keys(quadrantCounts).filter(q => quadrantCounts[q] === 0);
+    
+    // Adjust tools to fill missing quadrants
+    const adjustedTools = [...tools];
+    let adjustIndex = 0;
+
+    for (const missingQuad of missingQuadrants) {
+      if (adjustIndex >= adjustedTools.length) break;
+      
+      // Find a tool to adjust
+      const toolToAdjust = adjustedTools[adjustIndex];
+      const newScores = this.getScoresForQuadrant(missingQuad);
+      
+      adjustedTools[adjustIndex] = {
+        ...toolToAdjust,
+        impact: newScores.impact,
+        effort: newScores.effort,
+        quadrant: missingQuad,
+        reasoning: `${toolToAdjust.reasoning} (Adjusted for quadrant balance)`
+      };
+      
+      adjustIndex++;
+    }
+
+    return adjustedTools;
+  }
+
+  /**
+   * Get appropriate impact/effort scores for a specific quadrant
+   */
+  getScoresForQuadrant(quadrant) {
+    switch (quadrant) {
+      case 'q1': // Quick Wins - High Impact, Low Effort
+        return { 
+          impact: 8 + Math.random() * 2, // 8-10
+          effort: 1 + Math.random() * 4   // 1-5
+        };
+      case 'q2': // Major Projects - High Impact, High Effort  
+        return {
+          impact: 8 + Math.random() * 2, // 8-10
+          effort: 7 + Math.random() * 3   // 7-10
+        };
+      case 'q3': // Fill-ins - Low Impact, Low Effort
+        return {
+          impact: 1 + Math.random() * 4, // 1-5
+          effort: 1 + Math.random() * 4   // 1-5
+        };
+      case 'q4': // Time Wasters - Low Impact, High Effort
+        return {
+          impact: 1 + Math.random() * 4, // 1-5
+          effort: 7 + Math.random() * 3   // 7-10
+        };
+      default:
+        return { impact: 5, effort: 5 };
+    }
   }
 
   /**
