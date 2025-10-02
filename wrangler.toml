@@ -1,0 +1,17 @@
+name = "audit-tool"
+main = "worker.js"
+compatibility_date = "2024-10-01"
+
+# Durable Objects binding for the ToolEvaluationAgent
+[[durable_objects.bindings]]
+name = "TOOL_EVALUATION_AGENT"
+class_name = "ToolEvaluationAgent"
+
+# Workers AI binding
+[ai]
+binding = "AI"
+
+# Migrations for Durable Objects with SQL
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["ToolEvaluationAgent"]
