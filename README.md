@@ -2,13 +2,20 @@
 
 An intelligent tool adoption platform powered by **Cloudflare Agents** and **Workers AI** that evaluates AI tools based on impact and effort, automatically placing them in a decision-making quadrant matrix.
 
+## 🌐 **Live Demo**
+- **Frontend**: https://tooling-efforts.pages.dev
+- **API**: https://audit-tool.coscient.workers.dev
+- **GitHub**: https://github.com/czhengjuarez/tooling-efforts
+
 ## ✨ Key Features
 
 - 🎯 **No API Keys Required** - Uses Cloudflare Workers AI (no user setup needed!)
-- 📊 **Impact & Effort Analysis** - Intelligent evaluation on 1-10 scale
-- 🎨 **Visual Quadrant Matrix** - 2x2 grid for prioritization
-- 🏷️ **Smart Badges** - Impact/effort scores on each tool
-- 🖱️ **Drag & Drop** - Reorganize tools easily
+- 🧠 **Real AI Intelligence** - Context-aware, industry-specific recommendations
+- 📊 **Balanced Scoring** - Calibrated 1-10 scale with realistic distributions
+- 🎨 **Clean Modern UI** - Single container design with custom brand colors
+- 🏷️ **Decimal Precision** - Impact/effort scores to 1 decimal place
+- 🖱️ **Drag & Drop** - Reorganize tools with @dnd-kit
+- 🔄 **Auto-Clear** - Fresh start with each new prompt
 - 💰 **Cost-Effective** - Fixed $5-6/month (vs variable API costs)
 
 ## 🚀 Quick Start
@@ -88,23 +95,21 @@ test-agent.js                      # Test script
 
 ## 🎯 Example Requests
 
-Try these in the app:
+Try these to see the AI intelligence:
 
-**Marketing**
-- "Tools for social media marketing and content creation"
-- "Email marketing automation for e-commerce"
+**Industry-Specific**
+- "I need tools for a small bakery business" → Square POS, Toast, Google My Business
+- "Tools for a dental practice" → Dentrix, patient scheduling, HIPAA compliance
+- "Restaurant chain management" → POS systems, inventory, staff scheduling
 
-**Development**
-- "CI/CD and deployment tools for Node.js"
-- "Code quality and testing tools"
+**Business Functions**
+- "Marketing automation for e-commerce" → Klaviyo, Shopify apps, email tools
+- "Development tools for code quality" → SonarQube, GitHub Actions, testing frameworks
+- "CRM for B2B sales team" → Salesforce, HubSpot, LinkedIn Sales Navigator
 
-**Sales**
-- "CRM and sales automation for B2B"
-- "Lead generation tools"
-
-**General**
-- "Project management for remote teams"
-- "Collaboration tools for startups"
+**Company Stage**
+- "Startup collaboration tools" → Slack, Notion, basic project management
+- "Enterprise security solutions" → Advanced compliance, SSO, audit tools
 
 ## 🚀 Deploy to Production
 
@@ -145,13 +150,35 @@ See `CLOUDFLARE_AGENT_SETUP.md` for detailed instructions.
 5. Tools automatically placed in appropriate quadrants
 6. Sticky notes appear with visual impact/effort badges
 
+## 🧠 Intelligence Upgrade: Local vs Cloudflare AI
+
+### **Local Development (Simulation)**
+- **Keyword matching** - "bakery" → generic business tools
+- **Predefined categories** - Limited tool database
+- **Static scoring** - Randomized around base values
+
+### **Cloudflare AI (Production)**
+- **Contextual understanding** - "bakery" → Square POS, Toast, Google My Business
+- **Dynamic discovery** - Finds tools you didn't know existed
+- **Industry awareness** - Healthcare vs retail vs manufacturing needs
+- **Nuanced analysis** - Real impact/effort evaluation based on context
+
+### **Algorithm Calibration**
+- **Balanced thresholds** - High impact ≥ 7.5 (top 25% only)
+- **Critical evaluation** - "BE CRITICAL" prompt instruction
+- **Realistic distribution** - Most tools land in Q3 (Fill-ins) as expected
+- **Detailed rubric** - Clear examples for 1-10 scoring
+
 ## 🎨 UI Features
 
-- **Impact Badge** (💡 Blue) - Business value score
-- **Effort Badge** (⚡ Purple) - Implementation complexity
-- **Hover Tooltips** - Shows reasoning for placement
+- **Custom Brand Colors** - Deep magenta (#8F1F57) throughout
+- **Custom SVG Icons** - AI, impact, effort, and sticky note icons
+- **Impact Badge** (💡 Brand Color) - Business value score (1 decimal)
+- **Effort Badge** (⚡ Purple) - Implementation complexity (1 decimal)
+- **Hover Tooltips** - Shows AI reasoning for placement
 - **Drag & Drop** - Move tools between quadrants
-- **Clear All** - Remove AI suggestions
+- **Auto-Clear** - Previous suggestions cleared on new prompts
+- **Clean Layout** - Single container design, no nested cards
 
 ## 💰 Cost Comparison
 
@@ -178,10 +205,12 @@ All tests passing ✅:
 
 ## 📈 Status
 
-✅ **Fully Functional** - Working locally right now!  
-✅ **Production Ready** - Can deploy to Cloudflare anytime  
-✅ **Well Documented** - Multiple guides included  
-✅ **Tested** - All scenarios passing  
+✅ **Live & Deployed** - Running on Cloudflare with real AI!  
+✅ **Algorithm Balanced** - Fixed bias, realistic quadrant distribution  
+✅ **GitHub Integrated** - All code version controlled  
+✅ **Production Tested** - AI providing contextual, industry-specific suggestions  
+✅ **UI Polished** - Custom brand colors, icons, clean design  
+✅ **Well Documented** - Multiple guides and deployment instructions  
 
 ## 🤝 Contributing
 
@@ -204,4 +233,15 @@ Built with:
 
 ---
 
-**Ready to try it?** Run `npm install && node server.js` (Terminal 1) and `npm run dev` (Terminal 2), then open `http://localhost:5173`!
+## 🎯 **Try It Now!**
+
+**Live Demo**: https://tooling-efforts.pages.dev  
+**Local Setup**: `npm install && node server.js` (Terminal 1) and `npm run dev` (Terminal 2), then open `http://localhost:5173`
+
+**Test Prompts**:
+- "Tools for a dental practice"
+- "E-commerce startup selling handmade jewelry"  
+- "Manufacturing quality control"
+- "Restaurant chain management"
+
+See the AI intelligence in action! 🚀
