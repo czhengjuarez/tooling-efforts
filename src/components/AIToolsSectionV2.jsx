@@ -16,7 +16,7 @@ const AIToolsSectionV2 = ({ onGenerateTools, onClearAINotes, onClearAllNotes }) 
     // In production, use the Cloudflare Worker URL
     // In development, use local proxy
     if (import.meta.env.PROD) {
-      return 'https://audit-tool.YOUR-SUBDOMAIN.workers.dev/api/evaluate';
+      return 'https://audit-tool.coscient.workers.dev/api/evaluate';
     }
     return 'http://localhost:3001/api/evaluate';
   };

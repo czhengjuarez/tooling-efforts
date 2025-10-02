@@ -270,6 +270,45 @@ Respond in JSON format:
   }
 
   /**
+   * HTTP fetch handler for API requests
+   */
+  async fetch(request) {
+    const url = new URL(request.url);
+    
+    if (url.pathname === '/evaluate' && request.method === 'POST') {
+      try {
+        const { request: userRequest } = await request.json();
+        const tools = await this.evaluateTools(userRequest);
+        
+        return new Response(JSON.stringify(tools), {
+          headers: { 'Content-Type': 'application/json' }
+        });
+      } catch (error) {
+        return new Response(JSON.stringify({ error: error.message }), {
+          status: 500,
+          headers: { 'Content-Type': 'application/json' }
+        });
+      }
+    }
+    
+    if (url.pathname === '/history' && request.method === 'GET') {
+      try {
+        const history = await this.getHistory();
+        return new Response(JSON.stringify(history), {
+          headers: { 'Content-Type': 'application/json' }
+        });
+      } catch (error) {
+        return new Response(JSON.stringify({ error: error.message }), {
+          status: 500,
+          headers: { 'Content-Type': 'application/json' }
+        });
+      }
+    }
+
+    return new Response('Not Found', { status: 404 });
+  }
+
+  /**
    * WebSocket handler for real-time updates
    */
   async webSocketMessage(ws, message) {
