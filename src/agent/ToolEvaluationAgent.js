@@ -122,28 +122,41 @@ Tool: ${tool.name}
 Description: ${tool.description}
 Benefit: ${tool.benefit}
 
-Rate this tool on two dimensions:
-1. IMPACT: How much value/benefit will this tool provide? (1-10, where 10 is highest impact)
-2. EFFORT: How much time, cost, and complexity to implement? (1-10, where 10 is highest effort)
+Rate this tool on two dimensions (BE REALISTIC AND BALANCED):
+
+IMPACT (1-10): How much business value will this provide?
+- 1-3: Minimal impact (nice-to-have, small convenience)
+- 4-6: Moderate impact (useful but not game-changing)
+- 7-8: High impact (significant business value)
+- 9-10: Transformational impact (revolutionary for the business)
+
+EFFORT (1-10): How much work to implement and maintain?
+- 1-3: Low effort (quick setup, minimal learning)
+- 4-6: Moderate effort (some setup time, learning curve)
+- 7-8: High effort (complex setup, training needed)
+- 9-10: Very high effort (major project, extensive resources)
 
 Consider:
-- Implementation time
-- Learning curve
-- Cost (subscription, setup)
-- Integration complexity
-- Maintenance requirements
+- Implementation time and complexity
+- Learning curve for team
+- Cost (subscription, setup, ongoing)
+- Integration with existing systems
+- Maintenance and support requirements
+- Relevance to the specific user request
+
+BE CRITICAL: Not every tool should be high impact. Many tools are useful but not transformational.
 
 Respond in JSON format:
 {
   "impact": <number 1-10>,
   "effort": <number 1-10>,
-  "reasoning": "<brief explanation>"
+  "reasoning": "<brief explanation of scores>"
 }`;
 
     try {
       const response = await this.env.AI.run('@cf/meta/llama-3.1-8b-instruct', {
         messages: [
-          { role: 'system', content: 'You are an expert at evaluating software tools. Always respond with valid JSON.' },
+          { role: 'system', content: 'You are a critical business analyst evaluating software tools. Be realistic and balanced in your scoring. Most tools should score 4-6 for impact. Only truly transformational tools deserve 8+. Always respond with valid JSON.' },
           { role: 'user', content: prompt }
         ],
         temperature: 0.5,
@@ -177,8 +190,9 @@ Respond in JSON format:
    * Determine quadrant based on impact and effort scores
    */
   determineQuadrant(impact, effort) {
-    const highImpact = impact >= 6;
-    const highEffort = effort >= 6;
+    // More balanced thresholds - only top 30% are "high impact"
+    const highImpact = impact >= 7.5;
+    const highEffort = effort >= 6.5;
 
     if (highImpact && !highEffort) return 'q1'; // High Impact, Low Effort - Quick Wins
     if (highImpact && highEffort) return 'q2';  // High Impact, High Effort - Major Projects

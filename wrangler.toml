@@ -16,3 +16,6 @@ binding = "AI"
 [[migrations]]
 tag = "v1"
 new_sqlite_classes = ["ToolEvaluationAgent"]
+
+# Pages configuration
+pages_build_output_dir = "dist"
