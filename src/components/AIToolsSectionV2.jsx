@@ -93,6 +93,7 @@ const AIToolsSectionV2 = ({ onGenerateTools, onClearAINotes, onClearAllNotes }) 
           <div>
             <h2 className="text-2xl font-semibold text-gray-900">AI Tool Evaluator</h2>
             <p className="text-sm text-gray-600">Powered by Cloudflare AI - No API keys required</p>
+            <p className="text-xs text-amber-600 mt-1">⚠️ AI knowledge may be outdated. Verify current tool status before deciding.</p>
           </div>
         </div>
         <div className="inline-flex items-center bg-green-50 text-green-700 px-3 py-1 rounded-full text-sm">
@@ -218,12 +219,22 @@ const AIToolsSectionV2 = ({ onGenerateTools, onClearAINotes, onClearAllNotes }) 
               <li>• Tools are placed in quadrants automatically</li>
               <li>• Drag sticky notes to reorganize as needed</li>
             </ul>
+            
+            <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+              <h4 className="text-xs font-medium text-amber-800 mb-2">💡 Getting Better Results:</h4>
+              <ul className="text-xs text-amber-700 space-y-1">
+                <li>• Be specific: "design tools for mobile apps" vs "design tools"</li>
+                <li>• Add context: "for a 5-person startup" or "enterprise team"</li>
+                <li>• Include current year: "2024 project management tools"</li>
+                <li>• Mention preferences: "prefer open-source" or "must integrate with Slack"</li>
+              </ul>
+            </div>
           </div>
         </div>
         
         <div className="mt-4 flex items-start gap-2 text-xs text-gray-500">
           <Icon name="info" className="w-3 h-3 flex-shrink-0 mt-0.5" />
-          <p>Hover over badges on sticky notes to see detailed reasoning</p>
+          <p>Hover over badges for reasoning • Click "Research" links to verify current tool status</p>
         </div>
       </div>
     </div>

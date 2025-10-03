@@ -52,9 +52,9 @@ const StickyNote = ({ note, onUpdate, onDelete }) => {
         ×
       </button>
 
-      {/* AI Badge and Metrics */}
+      {/* AI-generated badges and research link */}
       {isAIGenerated && hasMetrics && (
-        <div className="absolute -top-1 -left-1 flex gap-0.5" title={note.reasoning || `Impact: ${note.impact}/10, Effort: ${note.effort}/10`}>
+        <div className="absolute top-1 right-1 flex gap-1">
           <span className="bg-primary-500 text-white text-[8px] px-1 rounded-sm font-bold flex items-center gap-0.5">
             <Icon name="lightbulb" className="w-2 h-2" />
             {Number(note.impact).toFixed(1)}
@@ -63,6 +63,23 @@ const StickyNote = ({ note, onUpdate, onDelete }) => {
             <Icon name="lightning" className="w-2 h-2" />
             {Number(note.effort).toFixed(1)}
           </span>
+        </div>
+      )}
+
+      {/* Research link for AI-generated tools */}
+      {isAIGenerated && (
+        <div className="absolute bottom-1 right-1">
+          <a
+            href={`https://www.google.com/search?q=${encodeURIComponent(note.content.split('\n')[0] + ' tool review 2024')}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-gray-800 text-[8px] px-1.5 py-0.5 rounded-sm font-medium transition-colors flex items-center gap-1"
+            onClick={(e) => e.stopPropagation()}
+            title="Research this tool"
+          >
+            <Icon name="search" className="w-2 h-2" />
+            Research
+          </a>
         </div>
       )}
 
