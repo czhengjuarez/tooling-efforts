@@ -57,14 +57,14 @@ const StickyNote = ({ note, onUpdate, onDelete }) => {
         <div className="absolute top-1 right-1 flex gap-1">
           <span 
             className="bg-primary-500 text-white text-[8px] px-1 rounded-sm font-bold flex items-center gap-0.5 cursor-help"
-            title={`Impact Score: ${Number(note.impact).toFixed(1)}/10 - ${note.reasoning || 'AI evaluation of business value'}`}
+            title={`Impact: ${Number(note.impact).toFixed(1)}/10 - Business value (higher = more valuable)`}
           >
             <Icon name="lightbulb" className="w-2 h-2" />
             {Number(note.impact).toFixed(1)}
           </span>
           <span 
             className="bg-purple-500 text-white text-[8px] px-1 rounded-sm font-bold flex items-center gap-0.5 cursor-help"
-            title={`Effort Score: ${Number(note.effort).toFixed(1)}/10 - ${note.reasoning || 'AI evaluation of implementation complexity'}`}
+            title={`Effort: ${Number(note.effort).toFixed(1)}/10 - Implementation complexity (higher = more work)`}
           >
             <Icon name="lightning" className="w-2 h-2" />
             {Number(note.effort).toFixed(1)}
