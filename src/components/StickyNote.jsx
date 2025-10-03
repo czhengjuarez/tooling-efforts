@@ -55,17 +55,11 @@ const StickyNote = ({ note, onUpdate, onDelete }) => {
       {/* AI-generated badges and research link */}
       {isAIGenerated && hasMetrics && (
         <div className="absolute top-1 right-1 flex gap-1">
-          <span 
-            className="bg-primary-500 text-white text-[8px] px-1 rounded-sm font-bold flex items-center gap-0.5 cursor-help"
-            title={`Impact: ${Number(note.impact).toFixed(1)}/10 - Business value (higher = more valuable)`}
-          >
+          <span className="bg-primary-500 text-white text-[8px] px-1 rounded-sm font-bold flex items-center gap-0.5">
             <Icon name="lightbulb" className="w-2 h-2" />
             {Number(note.impact).toFixed(1)}
           </span>
-          <span 
-            className="bg-purple-500 text-white text-[8px] px-1 rounded-sm font-bold flex items-center gap-0.5 cursor-help"
-            title={`Effort: ${Number(note.effort).toFixed(1)}/10 - Implementation complexity (higher = more work)`}
-          >
+          <span className="bg-purple-500 text-white text-[8px] px-1 rounded-sm font-bold flex items-center gap-0.5">
             <Icon name="lightning" className="w-2 h-2" />
             {Number(note.effort).toFixed(1)}
           </span>

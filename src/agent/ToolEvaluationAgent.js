@@ -143,8 +143,8 @@ ${balancingInstruction}
 
 Respond with JSON array in this exact format:
 [
-  {"impact": 5, "effort": 3, "reasoning": "brief explanation"},
-  {"impact": 6, "effort": 4, "reasoning": "brief explanation"}
+  {"impact": 5, "effort": 3},
+  {"impact": 6, "effort": 4}
 ]`;
 
     try {
@@ -173,8 +173,7 @@ Respond with JSON array in this exact format:
             ...tool,
             impact: Math.min(10, Math.max(1, evaluation.impact)),
             effort: Math.min(10, Math.max(1, evaluation.effort)),
-            quadrant: this.determineQuadrant(evaluation.impact, evaluation.effort),
-            reasoning: evaluation.reasoning || 'Batch evaluation'
+            quadrant: this.determineQuadrant(evaluation.impact, evaluation.effort)
           };
         });
 
@@ -211,8 +210,7 @@ Respond with JSON array in this exact format:
           ...tool,
           impact: evaluation.impact,
           effort: evaluation.effort,
-          quadrant: this.determineQuadrant(evaluation.impact, evaluation.effort),
-          reasoning: evaluation.reasoning
+          quadrant: this.determineQuadrant(evaluation.impact, evaluation.effort)
         });
       } catch (error) {
         console.error(`Failed to evaluate ${tool.name}:`, error);
@@ -221,8 +219,7 @@ Respond with JSON array in this exact format:
           ...tool,
           impact: fallbackEvaluation.impact,
           effort: fallbackEvaluation.effort,
-          quadrant: this.determineQuadrant(fallbackEvaluation.impact, fallbackEvaluation.effort),
-          reasoning: 'Fallback evaluation due to timeout'
+          quadrant: this.determineQuadrant(fallbackEvaluation.impact, fallbackEvaluation.effort)
         });
       }
     }
@@ -267,8 +264,7 @@ BE CRITICAL: Not every tool should be high impact. Many tools are useful but not
 Respond in JSON format:
 {
   "impact": <number 1-10>,
-  "effort": <number 1-10>,
-  "reasoning": "<brief explanation of scores>"
+  "effort": <number 1-10>
 }`;
 
     try {
@@ -294,8 +290,7 @@ Respond in JSON format:
         const evaluation = JSON.parse(jsonMatch[0]);
         return {
           impact: Math.min(10, Math.max(1, evaluation.impact)),
-          effort: Math.min(10, Math.max(1, evaluation.effort)),
-          reasoning: evaluation.reasoning || 'No reasoning provided'
+          effort: Math.min(10, Math.max(1, evaluation.effort))
         };
       }
     } catch (error) {
@@ -305,8 +300,7 @@ Respond in JSON format:
     // Fallback to random evaluation
     return {
       impact: Math.floor(Math.random() * 6) + 5, // 5-10
-      effort: Math.floor(Math.random() * 10) + 1, // 1-10
-      reasoning: 'Automated evaluation'
+      effort: Math.floor(Math.random() * 10) + 1 // 1-10
     };
   }
 
@@ -340,8 +334,7 @@ Respond in JSON format:
         ...toolToAdjust,
         impact: newScores.impact,
         effort: newScores.effort,
-        quadrant: missingQuad,
-        reasoning: `${toolToAdjust.reasoning} (Adjusted for quadrant balance)`
+        quadrant: missingQuad
       };
       
       adjustIndex++;

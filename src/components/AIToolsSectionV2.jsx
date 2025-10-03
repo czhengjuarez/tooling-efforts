@@ -234,7 +234,7 @@ const AIToolsSectionV2 = ({ onGenerateTools, onClearAINotes, onClearAllNotes }) 
         
         <div className="mt-4 flex items-start gap-2 text-xs text-gray-500">
           <Icon name="info" className="w-3 h-3 flex-shrink-0 mt-0.5" />
-          <p>Hover over badges for reasoning • Click "Research" links to verify current tool status</p>
+          <p>Click "Research" links to verify current tool status and get detailed information</p>
         </div>
       </div>
     </div>
